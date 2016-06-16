@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
 #include <Adafruit_NeoPixel.h>
+#include <SimpleTimer.h>
 
 ////////////////////    The BlynkAuth, Wifi Name, and Wifi Password are 
 // Blynk Settings //    stored in a separate file and excluded from GitHub
@@ -15,9 +16,10 @@
 #define BUTTON_PIN 0
 #define VIBE_PIN   5
 Adafruit_NeoPixel rgb = Adafruit_NeoPixel(1, WS2812_PIN, NEO_GRB + NEO_KHZ800);
+SimpleTimer Timer;
 int sensorThreshold = 512;
 unsigned long timeLimit = 10000;
-unsigned long currentTime,previousRead;
+byte interruptPin = 0;
 
 BLYNK_WRITE(V0) // Handle RGB from the zeRGBa
 {
@@ -53,6 +55,9 @@ void setup()
 
   // Initialize Blynk
   Blynk.begin(BlynkAuth, WiFiNetwork, WiFiPassword);
+  Timer.setInterval(10000L,enforce);
+  Timer.setInterval(200L,toggleVibe);
+  attachInterrupt(digitalPinToInterrupt(interruptPin), connectWifi, FALLING);
 }
 
 void loop()
@@ -60,29 +65,19 @@ void loop()
   // Execute Blynk.run() as often as possible during the loop
   Blynk.run(); 
   verify();
+  Timer.run();
 }
 
 void verify(){
-  currentTime = millis();
-  readSensor();
-  if(!checkTime()){
-    enforce();
+  if(readSensor()){
+    digitalWrite(VIBE_PIN, LOW);
+    Timer.restartTimer(0);
   };
 }
 
 bool readSensor()
 {
   if(analogRead(A0) > sensorThreshold){
-    previousRead = currentTime;
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
-bool checkTime(){
-  if(currentTime - previousRead < timeLimit){
     return true;
   }
   else{
@@ -97,5 +92,12 @@ void enforce(){
   delay(100);
 }
 
+void toggleVibe(){
+  
+}
 
+void connectWifi(){
+  rgb.setPixelColor(0, 0xFFFF00);
+  rgb.show();
+}
 
