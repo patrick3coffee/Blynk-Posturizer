@@ -3,11 +3,16 @@
 #include <BlynkSimpleEsp8266.h>
 #include <Adafruit_NeoPixel.h>
 #include <SimpleTimer.h>
+#define WIFINETWORKS 3
 
 ////////////////////    The BlynkAuth, Wifi Name, and Wifi Password are 
 // Blynk Settings //    stored in a separate file and excluded from GitHub
 ////////////////////    commits to protect my privacy. 
 #include "secretSettings.h"
+/*
+char BlynkAuth[] = yourBlynkAuthKey
+
+*/
 
 ///////////////////////
 // Hardware Settings //
@@ -54,7 +59,7 @@ void setup()
   pinMode(VIBE_PIN, OUTPUT); // Vibrator output
 
   // Initialize Blynk
-  Blynk.begin(BlynkAuth, WiFiNetwork, WiFiPassword);
+  Blynk.begin(BlynkAuth, WiFiNetwork[0], WiFiPassword[0]);
   Timer.setInterval(10000L,enforce);
   Timer.setInterval(200L,toggleVibe);
   attachInterrupt(digitalPinToInterrupt(interruptPin), connectWifi, FALLING);
@@ -97,7 +102,28 @@ void toggleVibe(){
 }
 
 void connectWifi(){
-  rgb.setPixelColor(0, 0xFFFF00);
-  rgb.show();
+  for(int i=0;i<WIFINETWORKS;i++){
+    //Display yellow
+    rgb.setPixelColor(0, 0xAAAA00);
+    rgb.show();
+    
+    //Try connecting to a WiFi network
+    Blynk.connectWifi(BlynkAuth, WiFiNetwork[i], WiFiPassword[i])
+    
+    //Try connecting to Blynk server
+    Blynk.connect(10);
+    
+    if(Blynk.connected()){
+      //Display green and end the loop
+      rgb.setPixelColor(0, 0x00FF00);
+      rgb.show();
+      break;
+    }
+    else{
+      //Display red and try next wifi network
+      rgb.setPixelColor(0, 0xFF0000);
+      rgb.show();
+    }
+  }
 }
 
