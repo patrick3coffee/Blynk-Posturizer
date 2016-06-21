@@ -26,8 +26,7 @@ char WiFiPassword[] = "YourWiFiPassword";
 Adafruit_NeoPixel rgb = Adafruit_NeoPixel(1, WS2812_PIN, NEO_GRB + NEO_KHZ800);
 Vibrator vibe(VIBE_PIN, 200);
 
-unsigned long timeLimit = 10000;
-unsigned long lastMuscleActivity;
+unsigned long lastMuscleActivity,timeLimit;
 int sensorReading,threshold;
 
 /*BLYNK_WRITE(V0) // Handle RGB from the zeRGBa
@@ -50,6 +49,10 @@ BLYNK_WRITE(V8){
 
 BLYNK_WRITE(V9){
   timeLimit = param.asInt() * 1000;
+}
+
+BLYNK_CONNECTED() {
+    Blynk.syncAll();
 }
 
 void setup()
@@ -86,7 +89,16 @@ void loop()
 }
 
 bool timeLimitReached(){
-  if(lastMuscleActivity + timeLimit < millis()){
+#ifdef DEBUG
+  Serial.print("timeLimitReached()");
+  unsigned long timeNow = millis();
+  Serial.println( timeNow );
+  Serial.print("Time limit: ");
+  Serial.println( timeLimit );
+  Serial.print("Time limit: ");
+  Serial.println( timeLimit );
+#endif
+  if((lastMuscleActivity + timeLimit) < millis()){
     return true;
   }
   else{

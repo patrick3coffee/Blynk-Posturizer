@@ -3,7 +3,7 @@
 class Vibrator{
 public:
   //constructor
-  Vibrator(int pin, int duration);
+  Vibrator(int pin, unsigned long duration);
 
   // if enabled check elapsed time and toggle vibrator
   void run();
@@ -17,6 +17,6 @@ private:
   unsigned long timerStart, previousToggle, timerDuration;
   
   void toggleVibe(unsigned long currentTime);
-  bool checkElapsedTime(unsigned long currentTime);
+  bool timeLimitReached(unsigned long currentTime);
 };
 

@@ -1,6 +1,6 @@
 #include "Vibrator.h"
 
-Vibrator::Vibrator(int pin, int duration){
+Vibrator::Vibrator(int pin, unsigned long duration){
   timerDuration = duration;
   
   // set Vibrator output
@@ -16,7 +16,7 @@ Vibrator::Vibrator(int pin, int duration){
 void Vibrator::run(){
   if(enable){
     unsigned long currentTime = millis();
-    if(checkElapsedTime(currentTime)){
+    if(timeLimitReached(currentTime)){
       toggleVibe(currentTime);
     }
   }
@@ -28,8 +28,8 @@ void Vibrator::enabled(bool setting){
   
 }
 
-bool Vibrator::checkElapsedTime(unsigned long currentTime){
-  if(previousToggle + timerDuration > currentTime){
+bool Vibrator::timeLimitReached(unsigned long currentTime){
+  if((previousToggle + timerDuration) < currentTime){
     return true;
   }
   else{
