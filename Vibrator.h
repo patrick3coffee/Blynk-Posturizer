@@ -9,11 +9,10 @@ public:
   void run();
 
   //enable or disable vibrator
-  void enable();
-  void disable();
+  void enabled(bool setting);
   
 private:
-  bool enabled;
+  bool enable;
   int vibePin;
   unsigned long timerStart, previousToggle, timerDuration;
   

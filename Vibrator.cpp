@@ -14,7 +14,7 @@ Vibrator::Vibrator(int pin, int duration){
 }
 
 void Vibrator::run(){
-  if(enabled){
+  if(enable){
     unsigned long currentTime = millis();
     if(checkElapsedTime(currentTime)){
       toggleVibe(currentTime);
@@ -22,20 +22,14 @@ void Vibrator::run(){
   }
 }
 
-void Vibrator::enable(){
-  enabled = true;
-  digitalWrite(vibePin, HIGH);
-  
-}
-
-void Vibrator::disable(){
-  enabled = false;
-  digitalWrite(vibePin, LOW);
+void Vibrator::enabled(bool setting){
+  enable = setting;
+  digitalWrite(vibePin, setting);
   
 }
 
 bool Vibrator::checkElapsedTime(unsigned long currentTime){
-  if((currentTime - previousToggle) > timerDuration){
+  if(previousToggle + timerDuration > currentTime){
     return true;
   }
   else{
